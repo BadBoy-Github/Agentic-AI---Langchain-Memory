@@ -1,0 +1,115 @@
+/* Clean & Elegant AI Chat Stylesheet */
+
+/* Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message-animate {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Markdown typography */
+.markdown-body {
+  color: #d4d4d8;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.markdown-body p {
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body strong {
+  color: #fafafa;
+  font-weight: 600;
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body ul { list-style-type: disc; }
+.markdown-body ol { list-style-type: decimal; }
+
+.markdown-body li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-body code:not(pre code) {
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e4e4e7;
+  padding: 0.15rem 0.375rem;
+  border-radius: 0.375rem;
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.markdown-body pre {
+  background: #121215 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  margin: 0.75rem 0;
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  background: transparent !important;
+  padding: 0;
+  font-size: 0.825rem;
+  line-height: 1.6;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.markdown-body blockquote {
+  border-left: 2px solid #6366f1;
+  padding-left: 0.875rem;
+  color: #a1a1aa;
+  margin: 0.75rem 0;
+}
+
+/* ReAct Trace Pill & Accordion */
+details.react-trace-pill summary::-webkit-details-marker {
+  display: none;
+}
+
+details.react-trace-pill summary {
+  list-style: none;
+}
+
+/* Subtle Shimmer for live reasoning */
+@keyframes subtlePulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.thinking-pulse {
+  animation: subtlePulse 1.5s ease-in-out infinite;
+}

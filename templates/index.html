@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini ReAct AI</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            surface: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              800: '#18181b',
+              850: '#121215',
+              900: '#0c0c0e',
+              950: '#060608',
+            },
+            accent: {
+              DEFAULT: '#6366f1',
+              hover: '#4f46e5',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Highlight.js & Marked & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-surface-950 text-zinc-100 h-full flex font-sans antialiased overflow-hidden selection:bg-indigo-500/30 selection:text-white">
+
+  <!-- Sidebar Overlay for mobile -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden transition-opacity"></div>
+
+  <!-- Sleek Left Sidebar -->
+  <aside id="sidebar" class="w-64 bg-surface-900 border-r border-zinc-800/60 flex flex-col justify-between shrink-0 transition-transform duration-300 z-40 fixed md:static inset-y-0 left-0 -translate-x-full md:translate-x-0">
+    
+    <!-- Top Section -->
+    <div class="p-4 flex flex-col h-full overflow-hidden">
+      
+      <!-- Brand & Collapse -->
+      <div class="flex items-center justify-between pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
+            <i class="fa-solid fa-sparkles text-white text-xs"></i>
+          </div>
+          <div>
+            <h1 class="text-xs font-semibold tracking-tight text-white flex items-center gap-1.5">
+              Gemini ReAct
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            </h1>
+          </div>
+        </div>
+
+        <button id="btn-close-sidebar" class="md:hidden text-zinc-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- New Chat Button -->
+      <button id="btn-new-session" class="mt-2 w-full flex items-center justify-between px-3 py-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-zinc-700/50 hover:border-zinc-600 transition text-xs font-medium group">
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-zinc-400 group-hover:text-white transition"></i>
+          <span>New chat</span>
+        </span>
+        <kbd class="text-[10px] text-zinc-400 bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-800">Ctrl+K</kbd>
+      </button>
+
+      <!-- Chat Threads Section -->
+      <div class="mt-5 flex-1 flex flex-col min-h-0">
+        <div class="flex items-center justify-between px-1 mb-2">
+          <span class="text-[11px] font-medium text-zinc-400 tracking-wider">Recents</span>
+          <button id="btn-clear-current-memory" title="Reset active session" class="text-[11px] text-zinc-400 hover:text-rose-400 transition">
+            Clear memory
+          </button>
+        </div>
+
+        <div id="session-list" class="flex-1 overflow-y-auto space-y-1 custom-scrollbar pr-1">
+          <!-- Session items dynamically injected -->
+        </div>
+      </div>
+
+      <!-- Bottom Tools & Model Status -->
+      <div class="pt-3 border-t border-zinc-800/60 mt-auto space-y-2">
+        <!-- Tools Mini Capsule -->
+        <div class="px-2 py-1.5 rounded-lg bg-zinc-900/80 border border-zinc-800/60 text-[11px] text-zinc-400 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-wrench text-indigo-400 text-[10px]"></i>
+            <span>Tools (3 active)</span>
+          </span>
+          <div class="flex items-center gap-1 text-[10px] text-zinc-400">
+            <span title="Calculator">🧮</span>
+            <span title="Web Search">🌐</span>
+            <span title="Date/Time">🕒</span>
+          </div>
+        </div>
+
+        <!-- Model indicator -->
+        <div class="flex items-center justify-between px-1 text-[11px] text-zinc-400">
+          <span class="flex items-center gap-1.5 truncate">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+            <span id="header-model-name" class="truncate font-mono text-[10px]">gemini-3.5-flash</span>
+          </span>
+          <span class="text-[10px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400">ReAct</span>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- Main Chat Container -->
+  <main class="flex-1 flex flex-col h-full min-w-0 bg-surface-950 relative">
+    
+    <!-- Top Minimalist Bar -->
+    <header class="h-12 border-b border-zinc-800/40 bg-surface-950/80 backdrop-blur-md px-4 flex items-center justify-between shrink-0 z-10">
+      <div class="flex items-center gap-3">
+        <button id="btn-toggle-sidebar" class="text-zinc-400 hover:text-white p-1 rounded-md hover:bg-zinc-800/60 transition">
+          <i class="fa-solid fa-bars text-sm"></i>
+        </button>
+        <span id="active-session-title" class="text-xs font-medium text-zinc-300 truncate max-w-[200px] sm:max-w-md">
+          Chat Session
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="active-turns-badge" class="text-[11px] text-zinc-400 bg-zinc-900/90 border border-zinc-800 px-2 py-0.5 rounded-full">
+          0 messages
+        </span>
+        <button id="btn-export-chat" title="Copy conversation" class="text-zinc-400 hover:text-zinc-200 p-1.5 rounded-md hover:bg-zinc-800/60 transition text-xs">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable Messages Canvas -->
+    <div id="chat-messages" class="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6 custom-scrollbar">
+      
+      <!-- Minimalist Welcome State -->
+      <div id="welcome-hero" class="max-w-xl mx-auto py-16 text-center space-y-6">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-violet-600 mx-auto flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white text-xl">
+          <i class="fa-solid fa-sparkles"></i>
+        </div>
+
+        <div class="space-y-2">
+          <h2 class="text-xl font-semibold tracking-tight text-white">How can I help you today?</h2>
+          <p class="text-xs text-zinc-400 max-w-sm mx-auto leading-relaxed">
+            I reason step-by-step using tools for math calculations, live web searches, and time queries with multi-turn memory.
+          </p>
+        </div>
+
+        <!-- Sleek Quick Prompt Chips -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-md mx-auto pt-2 text-left">
+          <button class="quick-prompt p-2.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800/80 hover:border-zinc-700 transition text-xs text-zinc-300 hover:text-white flex items-center gap-2.5">
+            <span class="text-amber-400">🕒</span>
+            <span class="truncate">What is today's date & time?</span>
+          </button>
+          <button class="quick-prompt p-2.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800/80 hover:border-zinc-700 transition text-xs text-zinc-300 hover:text-white flex items-center gap-2.5">
+            <span class="text-emerald-400">🧮</span>
+            <span class="truncate">Calculate (150 * 18%) + 150</span>
+          </button>
+          <button class="quick-prompt p-2.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800/80 hover:border-zinc-700 transition text-xs text-zinc-300 hover:text-white flex items-center gap-2.5">
+            <span class="text-cyan-400">🌐</span>
+            <span class="truncate">Search latest release of Python</span>
+          </button>
+          <button class="quick-prompt p-2.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800/80 hover:border-zinc-700 transition text-xs text-zinc-300 hover:text-white flex items-center gap-2.5">
+            <span class="text-indigo-400">🧠</span>
+            <span class="truncate">My lucky number is 42. Remember it.</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Floating Clean Bottom Input Bar -->
+    <div class="px-4 pb-4 pt-2 bg-gradient-to-t from-surface-950 via-surface-950/90 to-transparent shrink-0">
+      <div class="max-w-2xl mx-auto">
+        <form id="chat-form" class="relative flex items-center bg-zinc-900 border border-zinc-800/90 rounded-2xl shadow-xl shadow-black/40 focus-within:border-zinc-700 focus-within:ring-1 focus-within:ring-indigo-500/30 transition-all p-1.5 pl-4">
+          
+          <textarea
+            id="user-input"
+            rows="1"
+            placeholder="Message Gemini Agent..."
+            class="flex-1 bg-transparent border-0 text-sm text-zinc-100 placeholder-zinc-500 resize-none py-2 focus:outline-none max-h-36 custom-scrollbar leading-relaxed"
+          ></textarea>
+
+          <button
+            type="submit"
+            id="btn-send"
+            class="w-8 h-8 rounded-xl bg-white hover:bg-zinc-200 active:scale-95 disabled:opacity-20 disabled:hover:bg-white text-black transition flex items-center justify-center shrink-0 ml-2"
+          >
+            <i class="fa-solid fa-arrow-up text-xs font-bold"></i>
+          </button>
+        </form>
+
+        <p class="text-[10px] text-center text-zinc-400 mt-2">
+          Gemini ReAct with Conversational Memory · Shift+Enter for new line
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
